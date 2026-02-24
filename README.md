@@ -34,4 +34,6 @@ The UI now resembles a material dashboard with a sidebar menu and top navigation
 - You can host the files locally with `npx serve` or any static server to avoid CORS issues.
 - Chart.js is loaded from CDN for displaying language usage.
 
+**project link " https://teja80138.github.io/GitHub-Repo-Analyzer/ "**
+
 Enjoy exploring GitHub repositories!
