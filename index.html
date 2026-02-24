@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Repo Analyzer</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="initial-screen">
+        <h2>Search GitHub Username</h2>
+        <form id="init-search-form">
+            <input type="text" id="init-username-input" placeholder="Enter GitHub username" required />
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <div class="container" style="display:none;">
+        <aside class="sidebar">
+            <div class="sidebar-logo">Teja</div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="#">Dashboard</a></li>
+                <li><a href="#">Alerts</a></li>
+                <li><a href="#">Badges</a></li>
+                <li><a href="#">Buttons</a></li>
+                <li><a href="#">Cards</a></li>
+                <li><a href="#">Layout</a></li>
+                <li><a href="#">Pagination</a></li>
+                <li><a href="#">Popover</a></li>
+                <li><a href="#">Tooltips</a></li>
+            </ul>
+        </aside>
+        <div class="content">
+            <header class="topbar">
+                <form id="search-form">
+                    <input type="text" id="username-input" placeholder="Search user" required />
+                    <button type="submit">🔍</button>
+                </form>
+                <div class="user-avatar">
+                    <img src="https://avatars.githubusercontent.com/u/583231" alt="user" />
+                </div>
+            </header>
+            <main>
+        <div class="card" id="profile-card">
+            <section id="profile" class="hidden">
+                <img id="avatar" src="" alt="avatar" />
+                <div id="user-info">
+                    <h2 id="name"></h2>
+                    <p id="bio"></p>
+                </div>
+                <div class="stats-cards">
+                    <div class="stat-box">
+                        <div class="stat-value" id="followers"></div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="following"></div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="repo-count"></div>
+                        <div class="stat-label">Repos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="total-stars">0</div>
+                        <div class="stat-label">Stars</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="card" id="lang-card">
+            <section id="charts" class="hidden">
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>Top Languages</h3>
+                        <canvas id="lang-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Stars per Language</h3>
+                        <canvas id="star-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="card" id="repos-card">
+            <section id="repos" class="hidden">
+                <h3>Recent Repositories</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Language</th>
+                            <th>Stars</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repo-table-body"></tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Feature Sections -->
+    <div id="alerts" class="feature-section hidden" style="padding: 20px;">
+        <div class="card">
+            <h2>Alerts</h2>
+            <div class="alert alert-success">✓ Success Alert - Operation completed successfully</div>
+            <div class="alert alert-info">ℹ Info Alert - This is an informational message</div>
+            <div class="alert alert-warning">⚠ Warning Alert - Please review this warning</div>
+            <div class="alert alert-danger">✕ Danger Alert - An error occurred</div>
+        </div>
+    </div>
+    
+    <div id="badges" class="feature-section hidden" style="padding: 20px;">
+        <div class="card">
+            <h2>Badges</h2>
+            <span class="badge badge-primary">Primary</span>
+            <span class="badge badge-secondary">Secondary</span>
+            <span class="badge badge-success">Success</span>
+            <span class="badge badge-danger">Danger</span>
+            <span class="badge badge-warning">Warning</span>
+            <span class="badge badge-info">Info</span>
+        </div>
+    </div>
+    
+    <div id="buttons" class="feature-section hidden" style="padding: 20px;">
+        <div class="card">
+            <h2>Buttons</h2>
+            <button class="btn btn-primary">Primary Button</button>
+            <button class="btn btn-secondary">Secondary Button</button>
+            <button class="btn btn-success">Success Button</button>
+            <button class="btn btn-danger">Danger Button</button>
+            <button class="btn btn-warning">Warning Button</button>
+            <button class="btn btn-info">Info Button</button>
+        </div>
+    </div>
+    
+    <div id="cards" class="feature-section hidden" style="padding: 20px;">
+        <h2>Cards</h2>
+        <div class="card" style="margin-bottom: 15px;">
+            <h3>Card Title 1</h3>
+            <p>This is a sample card with some content. Cards are used to display content in organized containers.</p>
+        </div>
+        <div class="card" style="margin-bottom: 15px;">
+            <h3>Card Title 2</h3>
+            <p>Another card example with different content. Perfect for displaying grouped information.</p>
+        </div>
+        <div class="card">
+            <h3>Card Title 3</h3>
+            <p>Cards can be used for layouts, profile info, statistics, and much more.</p>
+        </div>
+    </div>
+    
+    <div id="layout" class="feature-section hidden" style="padding: 20px;">
+        <div class="card">
+            <h2>Layout Examples</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div style="background: #e3f2fd; padding: 20px; border-radius: 6px;">
+                    <h4>Column 1</h4>
+                    <p>This is the first column in a two-column layout.</p>
+                </div>
+                <div style="background: #f3e5f5; padding: 20px; border-radius: 6px;">
+                    <h4>Column 2</h4>
+                    <p>This is the second column in a two-column layout.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="pagination" class="feature-section hidden" style="padding: 20px;">
+        <div class="card">
+            <h2>Pagination</h2>
+            <div class="pagination">
+                <a href="#" class="page-item">«</a>
+                <a href="#" class="page-item">1</a>
+                <a href="#" class="page-item active">2</a>
+                <a href="#" class="page-item">3</a>
+                <a href="#" class="page-item">4</a>
+                <a href="#" class="page-item">»</a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="popover" class="feature-section hidden" style="padding: 20px;">
+        <div class="card">
+            <h2>Popover</h2>
+            <button class="btn btn-info popover-btn" data-popover="Popover Title" data-content="Popover content goes here">Hover for Popover</button>
+            <div class="popover-box hidden">
+                <div class="popover-title">Popover Title</div>
+                <div class="popover-content">Popover content goes here</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="tooltips" class="feature-section hidden" style="padding: 20px;">
+        <div class="card">
+            <h2>Tooltips</h2>
+            <button class="btn btn-info tooltip-btn" title="This is a tooltip">Hover for Tooltip</button>
+            <span style="margin-left: 20px;"><button class="btn btn-primary tooltip-btn" title="Another tooltip example">Another Tooltip</button></span>
+            <p style="margin-top: 15px;"><em>Hover over the buttons to see tooltips</em></p>
+        </div>
+    </div>
+    </div> <!-- container -->
+    <footer>
+        <p>Data from GitHub Public API</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
