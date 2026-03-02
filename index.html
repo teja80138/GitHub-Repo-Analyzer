@@ -1,213 +1,719 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitHub Repo Analyzer</title>
+    <meta name="description"
+        content="Analyze any GitHub user's profile, repositories, language usage, and activity stats with beautiful visualizations." />
     <link rel="stylesheet" href="css/style.css" />
-    <!-- Chart.js CDN -->
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
+
+    <!-- ══════════════════════════════════════════
+     LANDING SCREEN
+     ══════════════════════════════════════════ -->
     <div id="initial-screen">
-        <h2>Search GitHub Username</h2>
-        <form id="init-search-form">
-            <input type="text" id="init-username-input" placeholder="Enter GitHub username" required />
-            <button type="submit">Search</button>
-        </form>
+        <div class="landing-card">
+            <span class="landing-logo">🐙</span>
+            <h1>GitHub Repo Analyzer</h1>
+            <p>Explore any developer's profile, repositories, language trends &amp; activity at a glance.</p>
+            <div class="landing-tags">
+                <span class="landing-tag"><i class="fa-brands fa-github"></i> Public API</span>
+                <span class="landing-tag"><i class="fa-solid fa-chart-pie"></i> Visualizations</span>
+                <span class="landing-tag"><i class="fa-solid fa-bolt"></i> Real-time</span>
+            </div>
+            <form id="init-search-form" autocomplete="off">
+                <input type="text" id="init-username-input" placeholder="Enter GitHub username…" required />
+                <button type="submit"><i class="fa-solid fa-arrow-right"></i> Analyze</button>
+            </form>
+            <div class="landing-error" id="landing-error"></div>
+        </div>
     </div>
+
+    <!-- ══════════════════════════════════════════
+     DASHBOARD LAYOUT
+     ══════════════════════════════════════════ -->
     <div class="container" style="display:none;">
+
+        <!-- ── Sidebar ── -->
         <aside class="sidebar">
-            <div class="sidebar-logo">Teja</div>
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon">🐙</span>
+                <span class="sidebar-logo-text">RepoAnalyzer</span>
+            </div>
+
+            <p class="sidebar-section-label">Main</p>
             <ul class="sidebar-menu">
-                <li class="active"><a href="#">Dashboard</a></li>
-                <li><a href="#">Alerts</a></li>
-                <li><a href="#">Badges</a></li>
-                <li><a href="#">Buttons</a></li>
-                <li><a href="#">Cards</a></li>
-                <li><a href="#">Layout</a></li>
-                <li><a href="#">Pagination</a></li>
-                <li><a href="#">Popover</a></li>
-                <li><a href="#">Tooltips</a></li>
+                <li class="active" data-section="dashboard">
+                    <a href="#"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                </li>
+            </ul>
+
+            <p class="sidebar-section-label">Components</p>
+            <ul class="sidebar-menu">
+                <li data-section="alerts">
+                    <a href="#"><i class="fa-solid fa-bell"></i> Alerts</a>
+                </li>
+                <li data-section="badges">
+                    <a href="#"><i class="fa-solid fa-tag"></i> Badges</a>
+                </li>
+                <li data-section="buttons">
+                    <a href="#"><i class="fa-solid fa-hand-pointer"></i> Buttons</a>
+                </li>
+                <li data-section="cards">
+                    <a href="#"><i class="fa-solid fa-layer-group"></i> Cards</a>
+                </li>
+                <li data-section="layout">
+                    <a href="#"><i class="fa-solid fa-table-columns"></i> Layout</a>
+                </li>
+                <li data-section="pagination">
+                    <a href="#"><i class="fa-solid fa-ellipsis"></i> Pagination</a>
+                </li>
+                <li data-section="popover">
+                    <a href="#"><i class="fa-solid fa-comment-dots"></i> Popover</a>
+                </li>
+                <li data-section="tooltips">
+                    <a href="#"><i class="fa-solid fa-circle-info"></i> Tooltips</a>
+                </li>
             </ul>
         </aside>
+
+        <!-- ── Content ── -->
         <div class="content">
+
+            <!-- Topbar -->
             <header class="topbar">
-                <form id="search-form">
-                    <input type="text" id="username-input" placeholder="Search user" required />
-                    <button type="submit">🔍</button>
+                <form id="search-form" autocomplete="off">
+                    <input type="text" id="username-input" placeholder="Search another user…" />
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </form>
-                <div class="user-avatar">
-                    <img src="https://avatars.githubusercontent.com/u/583231" alt="user" />
+                <div class="topbar-right">
+                    <span class="topbar-username" id="topbar-username"></span>
+                    <div class="user-avatar">
+                        <img id="topbar-avatar"
+                            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                            alt="avatar" />
+                    </div>
                 </div>
             </header>
+
+            <!-- Main scrollable -->
             <main>
-        <div class="card" id="profile-card">
-            <section id="profile" class="hidden">
-                <img id="avatar" src="" alt="avatar" />
-                <div id="user-info">
-                    <h2 id="name"></h2>
-                    <p id="bio"></p>
-                </div>
-                <div class="stats-cards">
-                    <div class="stat-box">
-                        <div class="stat-value" id="followers"></div>
-                        <div class="stat-label">Followers</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="following"></div>
-                        <div class="stat-label">Following</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="repo-count"></div>
-                        <div class="stat-label">Repos</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="total-stars">0</div>
-                        <div class="stat-label">Stars</div>
-                    </div>
-                </div>
-            </section>
-        </div>
 
-        <div class="card" id="lang-card">
-            <section id="charts" class="hidden">
-                <div class="chart-row">
-                    <div class="chart-container">
-                        <h3>Top Languages</h3>
-                        <canvas id="lang-chart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Stars per Language</h3>
-                        <canvas id="star-chart"></canvas>
-                    </div>
-                </div>
-            </section>
-        </div>
+                <!-- ─── DASHBOARD ─── -->
+                <div id="dashboard-section">
 
-        <div class="card" id="repos-card">
-            <section id="repos" class="hidden">
-                <h3>Recent Repositories</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Language</th>
-                            <th>Stars</th>
-                            <th>Last Updated</th>
-                        </tr>
-                    </thead>
-                    <tbody id="repo-table-body"></tbody>
-                </table>
-            </section>
-        </div>
-    </main>
-    
-    <!-- Feature Sections -->
-    <div id="alerts" class="feature-section hidden" style="padding: 20px;">
-        <div class="card">
-            <h2>Alerts</h2>
-            <div class="alert alert-success">✓ Success Alert - Operation completed successfully</div>
-            <div class="alert alert-info">ℹ Info Alert - This is an informational message</div>
-            <div class="alert alert-warning">⚠ Warning Alert - Please review this warning</div>
-            <div class="alert alert-danger">✕ Danger Alert - An error occurred</div>
-        </div>
-    </div>
-    
-    <div id="badges" class="feature-section hidden" style="padding: 20px;">
-        <div class="card">
-            <h2>Badges</h2>
-            <span class="badge badge-primary">Primary</span>
-            <span class="badge badge-secondary">Secondary</span>
-            <span class="badge badge-success">Success</span>
-            <span class="badge badge-danger">Danger</span>
-            <span class="badge badge-warning">Warning</span>
-            <span class="badge badge-info">Info</span>
-        </div>
-    </div>
-    
-    <div id="buttons" class="feature-section hidden" style="padding: 20px;">
-        <div class="card">
-            <h2>Buttons</h2>
-            <button class="btn btn-primary">Primary Button</button>
-            <button class="btn btn-secondary">Secondary Button</button>
-            <button class="btn btn-success">Success Button</button>
-            <button class="btn btn-danger">Danger Button</button>
-            <button class="btn btn-warning">Warning Button</button>
-            <button class="btn btn-info">Info Button</button>
-        </div>
-    </div>
-    
-    <div id="cards" class="feature-section hidden" style="padding: 20px;">
-        <h2>Cards</h2>
-        <div class="card" style="margin-bottom: 15px;">
-            <h3>Card Title 1</h3>
-            <p>This is a sample card with some content. Cards are used to display content in organized containers.</p>
-        </div>
-        <div class="card" style="margin-bottom: 15px;">
-            <h3>Card Title 2</h3>
-            <p>Another card example with different content. Perfect for displaying grouped information.</p>
-        </div>
-        <div class="card">
-            <h3>Card Title 3</h3>
-            <p>Cards can be used for layouts, profile info, statistics, and much more.</p>
-        </div>
-    </div>
-    
-    <div id="layout" class="feature-section hidden" style="padding: 20px;">
-        <div class="card">
-            <h2>Layout Examples</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                <div style="background: #e3f2fd; padding: 20px; border-radius: 6px;">
-                    <h4>Column 1</h4>
-                    <p>This is the first column in a two-column layout.</p>
+                    <!-- Error message -->
+                    <div id="profile-error" class="error-message hidden" style="margin-bottom:20px;">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span id="profile-error-text"></span>
+                    </div>
+
+                    <!-- Profile loading skeleton -->
+                    <div id="loading-profile" class="card hidden">
+                        <div style="display:flex;gap:24px;align-items:flex-start;">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div class="skeleton-info">
+                                <div class="skeleton skeleton-text" style="width:60%;"></div>
+                                <div class="skeleton skeleton-text" style="width:40%;"></div>
+                                <div class="skeleton skeleton-text" style="width:80%;"></div>
+                            </div>
+                        </div>
+                        <div class="stats-cards" style="margin-top:20px;">
+                            <div class="skeleton skeleton-stat"></div>
+                            <div class="skeleton skeleton-stat"></div>
+                            <div class="skeleton skeleton-stat"></div>
+                            <div class="skeleton skeleton-stat"></div>
+                        </div>
+                    </div>
+
+                    <!-- Profile card -->
+                    <div class="card hidden" id="profile-card">
+                        <section id="profile">
+                            <img id="avatar" src="" alt="avatar" />
+                            <div id="user-info">
+                                <h2 id="name"></h2>
+                                <p id="bio"></p>
+                                <div class="user-meta" id="user-meta"></div>
+                            </div>
+                        </section>
+                        <div class="stats-cards" style="margin-top:20px;">
+                            <div class="stat-box">
+                                <div class="stat-value" id="followers">—</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="following">—</div>
+                                <div class="stat-label">Following</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="repo-count">—</div>
+                                <div class="stat-label">Repos</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="total-stars">—</div>
+                                <div class="stat-label">Total Stars</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts card -->
+                    <div class="card hidden" id="lang-card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-chart-pie"></i> Language Analytics</span>
+                        </div>
+                        <section id="charts">
+                            <div class="chart-row">
+                                <div class="chart-container">
+                                    <h3>Top Languages</h3>
+                                    <canvas id="lang-chart"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h3>Stars per Language</h3>
+                                    <canvas id="star-chart"></canvas>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Repos card -->
+                    <div class="card hidden" id="repos-card">
+                        <div class="repos-header">
+                            <span class="card-title"><i class="fa-solid fa-code-branch"></i> Recent Repositories</span>
+                        </div>
+                        <section id="repos">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Repository</th>
+                                        <th>Language</th>
+                                        <th>Stars</th>
+                                        <th>Last Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="repo-table-body"></tbody>
+                            </table>
+                        </section>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div id="empty-state" style="text-align:center;padding:80px 20px;color:var(--text-muted);">
+                        <div style="font-size:4rem;margin-bottom:16px;">🔍</div>
+                        <h3 style="color:var(--text-secondary);margin-bottom:8px;">Search a GitHub user</h3>
+                        <p style="font-size:0.9rem;">Enter a username above to explore their repositories and stats.</p>
+                    </div>
                 </div>
-                <div style="background: #f3e5f5; padding: 20px; border-radius: 6px;">
-                    <h4>Column 2</h4>
-                    <p>This is the second column in a two-column layout.</p>
+
+                <!-- ─── ALERTS ─── -->
+                <div id="alerts" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-bell"></i> Alert Components</span>
+                            <span style="font-size:0.78rem;color:var(--text-muted);">Click × to dismiss</span>
+                        </div>
+                        <div class="alerts-container">
+                            <div class="alert alert-success">
+                                <span class="alert-icon">✅</span>
+                                <div class="alert-body">
+                                    <div class="alert-title">Success — Operation completed!</div>
+                                    <div class="alert-desc">Your changes have been saved successfully. Everything is
+                                        working as expected.</div>
+                                </div>
+                                <button class="alert-dismiss" title="Dismiss">×</button>
+                            </div>
+                            <div class="alert alert-info">
+                                <span class="alert-icon">ℹ️</span>
+                                <div class="alert-body">
+                                    <div class="alert-title">Info — Heads up!</div>
+                                    <div class="alert-desc">This is a purely informational notice. No action is required
+                                        from you.</div>
+                                </div>
+                                <button class="alert-dismiss" title="Dismiss">×</button>
+                            </div>
+                            <div class="alert alert-warning">
+                                <span class="alert-icon">⚠️</span>
+                                <div class="alert-body">
+                                    <div class="alert-title">Warning — Review required</div>
+                                    <div class="alert-desc">Some settings may need attention. Please review before
+                                        continuing.</div>
+                                </div>
+                                <button class="alert-dismiss" title="Dismiss">×</button>
+                            </div>
+                            <div class="alert alert-danger">
+                                <span class="alert-icon">🚨</span>
+                                <div class="alert-body">
+                                    <div class="alert-title">Danger — Action failed</div>
+                                    <div class="alert-desc">An unexpected error occurred. Please try again or contact
+                                        support.</div>
+                                </div>
+                                <button class="alert-dismiss" title="Dismiss">×</button>
+                            </div>
+                        </div>
+                        <div style="margin-top:24px;">
+                            <button class="btn btn-ghost btn-sm" id="restore-alerts"><i
+                                    class="fa-solid fa-rotate-left"></i> Restore all alerts</button>
+                            <button class="btn btn-primary btn-sm" id="show-toast-demo" style="margin-left:8px;"><i
+                                    class="fa-solid fa-bell"></i> Show Toast Notification</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <!-- ─── BADGES ─── -->
+                <div id="badges" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-tag"></i> Badge Components</span>
+                            <span style="font-size:0.78rem;color:var(--text-muted);">Click any badge to copy its
+                                text</span>
+                        </div>
+
+                        <div class="badge-section-title">Pill Badges</div>
+                        <div class="badges-grid">
+                            <span class="badge badge-primary"><i class="fa-solid fa-star"></i> Primary</span>
+                            <span class="badge badge-secondary"><i class="fa-solid fa-circle"></i> Secondary</span>
+                            <span class="badge badge-success"><i class="fa-solid fa-check"></i> Success</span>
+                            <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Danger</span>
+                            <span class="badge badge-warning"><i class="fa-solid fa-triangle-exclamation"></i>
+                                Warning</span>
+                            <span class="badge badge-info"><i class="fa-solid fa-circle-info"></i> Info</span>
+                            <span class="badge badge-gradient"><i class="fa-solid fa-bolt"></i> Gradient</span>
+                        </div>
+
+                        <div class="badge-section-title">Square Badges</div>
+                        <div class="badges-grid">
+                            <span class="badge badge-pill badge-primary">v2.0.1</span>
+                            <span class="badge badge-pill badge-success">Stable</span>
+                            <span class="badge badge-pill badge-warning">Beta</span>
+                            <span class="badge badge-pill badge-danger">Deprecated</span>
+                            <span class="badge badge-pill badge-secondary">Draft</span>
+                            <span class="badge badge-pill badge-info">New</span>
+                        </div>
+
+                        <div class="badge-section-title">Counter Badges</div>
+                        <div class="badges-grid">
+                            <span class="badge badge-primary">🔔 Notifications <strong
+                                    style="margin-left:4px;background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:10px;">12</strong></span>
+                            <span class="badge badge-danger">🐛 Issues <strong
+                                    style="margin-left:4px;background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:10px;">5</strong></span>
+                            <span class="badge badge-success">⭐ Stars <strong
+                                    style="margin-left:4px;background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:10px;">238</strong></span>
+                            <span class="badge badge-warning">🔀 PRs <strong
+                                    style="margin-left:4px;background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:10px;">3</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── BUTTONS ─── -->
+                <div id="buttons" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-hand-pointer"></i> Button Components</span>
+                        </div>
+
+                        <div class="badge-section-title">Solid Variants</div>
+                        <div class="btn-showcase">
+                            <button class="btn btn-primary"><i class="fa-solid fa-star"></i> Primary</button>
+                            <button class="btn btn-secondary">Secondary</button>
+                            <button class="btn btn-success"><i class="fa-solid fa-check"></i> Success</button>
+                            <button class="btn btn-danger"><i class="fa-solid fa-trash"></i> Danger</button>
+                            <button class="btn btn-warning"><i class="fa-solid fa-triangle-exclamation"></i>
+                                Warning</button>
+                            <button class="btn btn-info"><i class="fa-solid fa-circle-info"></i> Info</button>
+                            <button class="btn btn-ghost">Ghost</button>
+                        </div>
+
+                        <div class="badge-section-title">Outline Variants</div>
+                        <div class="btn-showcase">
+                            <button class="btn btn-outline-primary">Outline Primary</button>
+                            <button class="btn btn-outline-success">Outline Success</button>
+                            <button class="btn btn-outline-danger">Outline Danger</button>
+                        </div>
+
+                        <div class="badge-section-title">Sizes</div>
+                        <div class="btn-showcase" style="align-items:center;">
+                            <button class="btn btn-primary btn-sm">Small</button>
+                            <button class="btn btn-primary">Default</button>
+                            <button class="btn btn-primary btn-lg">Large</button>
+                        </div>
+
+                        <div class="badge-section-title">States</div>
+                        <div class="btn-showcase">
+                            <button class="btn btn-primary" id="loading-demo-btn">
+                                <span class="btn-text">Click to Load</span>
+                            </button>
+                            <button class="btn btn-success" disabled><i class="fa-solid fa-lock"></i> Disabled</button>
+                            <button class="btn btn-danger loading"><span class="btn-text">Loading…</span></button>
+                        </div>
+
+                        <div class="badge-section-title">Button Groups</div>
+                        <div class="btn-showcase">
+                            <div class="btn-group">
+                                <button class="btn btn-secondary">Left</button>
+                                <button class="btn btn-secondary">Center</button>
+                                <button class="btn btn-secondary">Right</button>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary"><i class="fa-solid fa-bold"></i></button>
+                                <button class="btn btn-primary"><i class="fa-solid fa-italic"></i></button>
+                                <button class="btn btn-primary"><i class="fa-solid fa-underline"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── CARDS ─── -->
+                <div id="cards" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-layer-group"></i> Card Components</span>
+                        </div>
+
+                        <div class="badge-section-title">Hover Lift Cards</div>
+                        <div class="cards-grid" style="margin-bottom:20px;">
+                            <div class="showcase-card">
+                                <div class="showcase-card-header"
+                                    style="background:linear-gradient(135deg,#1f6feb,#2563eb);">🚀</div>
+                                <div class="showcase-card-body">
+                                    <h4>Feature Card</h4>
+                                    <p>Hover me to see the lift effect. Cards are perfect for grouping related content
+                                        together.</p>
+                                </div>
+                            </div>
+                            <div class="showcase-card">
+                                <div class="showcase-card-header"
+                                    style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">💡</div>
+                                <div class="showcase-card-body">
+                                    <h4>Idea Card</h4>
+                                    <p>Use cards to present ideas, projects, or any content that benefits from clear
+                                        visual separation.</p>
+                                </div>
+                            </div>
+                            <div class="showcase-card">
+                                <div class="showcase-card-header"
+                                    style="background:linear-gradient(135deg,#238636,#2ea043);">📊</div>
+                                <div class="showcase-card-body">
+                                    <h4>Stats Card</h4>
+                                    <p>Cards work great for displaying statistics, metrics, or key numbers at a glance.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="showcase-card">
+                                <div class="showcase-card-header"
+                                    style="background:linear-gradient(135deg,#b91c1c,#dc2626);">⚡</div>
+                                <div class="showcase-card-body">
+                                    <h4>Action Card</h4>
+                                    <p>Action cards can include buttons, links, or other interactive elements for user
+                                        engagement.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="badge-section-title">Flip Cards (Hover to flip)</div>
+                        <div
+                            style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
+                            <div class="flip-card-wrap">
+                                <div class="flip-card">
+                                    <div class="flip-front"><span style="font-size:2rem;">🐙</span><span>GitHub</span>
+                                    </div>
+                                    <div class="flip-back"><span style="font-size:2rem;">⭐</span><span>Star it!</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flip-card-wrap">
+                                <div class="flip-card">
+                                    <div class="flip-front"><span style="font-size:2rem;">🎨</span><span>Design</span>
+                                    </div>
+                                    <div class="flip-back"><span style="font-size:2rem;">✨</span><span>Premium UI</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flip-card-wrap">
+                                <div class="flip-card">
+                                    <div class="flip-front"><span style="font-size:2rem;">📦</span><span>Explore</span>
+                                    </div>
+                                    <div class="flip-back"><span style="font-size:2rem;">🔗</span><span>Discover</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="badge-section-title">Gradient Header Cards</div>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
+                            <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+                                <div class="grad-card-header"
+                                    style="background:linear-gradient(135deg,#2563eb,#7c3aed);">🌟 Premium</div>
+                                <div
+                                    style="padding:16px;background:var(--bg-card);font-size:0.85rem;color:var(--text-secondary);">
+                                    A card with a gorgeous gradient header. Perfect for pricing tiers or featured
+                                    content.</div>
+                            </div>
+                            <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+                                <div class="grad-card-header"
+                                    style="background:linear-gradient(135deg,#238636,#0891b2);">🚀 Pro</div>
+                                <div
+                                    style="padding:16px;background:var(--bg-card);font-size:0.85rem;color:var(--text-secondary);">
+                                    Another variation using a teal-to-green gradient. Mix and match colors for visual
+                                    hierarchy.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── LAYOUT ─── -->
+                <div id="layout" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-table-columns"></i> Layout System</span>
+                        </div>
+
+                        <div class="layout-demo">
+                            <div class="layout-label">2-Column Grid</div>
+                            <div class="layout-grid-2">
+                                <div class="layout-box">Column 1</div>
+                                <div class="layout-box">Column 2</div>
+                            </div>
+                        </div>
+
+                        <div class="layout-demo">
+                            <div class="layout-label">3-Column Grid</div>
+                            <div class="layout-grid-3">
+                                <div class="layout-box">Col A</div>
+                                <div class="layout-box">Col B</div>
+                                <div class="layout-box">Col C</div>
+                            </div>
+                        </div>
+
+                        <div class="layout-demo">
+                            <div class="layout-label">4-Column Grid</div>
+                            <div class="layout-grid-4">
+                                <div class="layout-box">1</div>
+                                <div class="layout-box">2</div>
+                                <div class="layout-box">3</div>
+                                <div class="layout-box">4</div>
+                            </div>
+                        </div>
+
+                        <div class="layout-demo">
+                            <div class="layout-label">Sidebar + Main (200px sidebar)</div>
+                            <div class="layout-sidebar-main">
+                                <div class="layout-box sidebar-mock">
+                                    <i class="fa-solid fa-bars"
+                                        style="font-size:1.5rem;color:var(--accent-2);margin-bottom:8px;"></i>
+                                    Sidebar
+                                </div>
+                                <div class="layout-box main-mock">
+                                    <div>
+                                        <i class="fa-solid fa-file-lines"
+                                            style="font-size:1.5rem;color:var(--success);margin-bottom:8px;display:block;"></i>
+                                        Main Content Area
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layout-demo">
+                            <div class="layout-label">Auto-fill Grid (min 160px)</div>
+                            <div
+                                style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+                                <div class="layout-box" style="min-height:50px;">Auto</div>
+                                <div class="layout-box" style="min-height:50px;">Auto</div>
+                                <div class="layout-box" style="min-height:50px;">Auto</div>
+                                <div class="layout-box" style="min-height:50px;">Auto</div>
+                                <div class="layout-box" style="min-height:50px;">Auto</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── PAGINATION ─── -->
+                <div id="pagination" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-ellipsis"></i> Pagination</span>
+                        </div>
+
+                        <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                            <span style="font-size:0.85rem;color:var(--text-secondary);">Items per page:</span>
+                            <select class="per-page-select" id="per-page">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span style="font-size:0.8rem;color:var(--text-muted);" id="pagination-info">Showing 1–10 of
+                                87 items</span>
+                        </div>
+
+                        <div class="pagination" id="pagination-demo"></div>
+
+                        <div
+                            style="margin-top:24px;padding:16px;background:rgba(88,166,255,0.05);border:1px solid rgba(88,166,255,0.15);border-radius:var(--radius-sm);">
+                            <p style="font-size:0.85rem;color:var(--text-secondary);">
+                                <strong style="color:var(--accent);">Active page: <span
+                                        id="active-page-display">1</span></strong>
+                                &nbsp;— Click any page number to navigate. The pagination component updates dynamically.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── POPOVER ─── -->
+                <div id="popover" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-comment-dots"></i> Popover</span>
+                            <span style="font-size:0.78rem;color:var(--text-muted);">Click buttons to toggle</span>
+                        </div>
+
+                        <div style="display:flex;flex-wrap:wrap;gap:40px;padding:40px 20px;align-items:flex-end;">
+
+                            <div class="popover-demo">
+                                <button class="btn btn-primary popover-btn" id="pop-info-btn">
+                                    <i class="fa-solid fa-circle-info"></i> Info Popover
+                                </button>
+                                <div class="popover-box hidden" id="pop-info">
+                                    <div class="popover-title"><i class="fa-solid fa-circle-info"></i> What is this?
+                                    </div>
+                                    <div class="popover-content">A popover provides extra context when triggered. It
+                                        floats above UI elements and closes when you click elsewhere.</div>
+                                </div>
+                            </div>
+
+                            <div class="popover-demo">
+                                <button class="btn btn-success popover-btn" id="pop-success-btn">
+                                    <i class="fa-solid fa-check"></i> Success Popover
+                                </button>
+                                <div class="popover-box hidden" id="pop-success">
+                                    <div class="popover-title" style="color:#56d364;"><i
+                                            class="fa-solid fa-check-circle"></i> Verified</div>
+                                    <div class="popover-content">Your identity has been verified successfully. All
+                                        systems are operating normally.</div>
+                                </div>
+                            </div>
+
+                            <div class="popover-demo">
+                                <button class="btn btn-warning popover-btn" id="pop-warn-btn">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Warning Popover
+                                </button>
+                                <div class="popover-box hidden" id="pop-warn">
+                                    <div class="popover-title" style="color:#e3b341;"><i
+                                            class="fa-solid fa-triangle-exclamation"></i> Warning</div>
+                                    <div class="popover-content">This action is irreversible. Please make sure you want
+                                        to proceed before continuing.</div>
+                                </div>
+                            </div>
+
+                            <div class="popover-demo">
+                                <button class="btn btn-danger popover-btn" id="pop-danger-btn">
+                                    <i class="fa-solid fa-skull"></i> Danger Popover
+                                </button>
+                                <div class="popover-box hidden" id="pop-danger">
+                                    <div class="popover-title" style="color:#f88379;"><i class="fa-solid fa-xmark"></i>
+                                        Danger Zone</div>
+                                    <div class="popover-content">This will permanently delete all data. This action
+                                        cannot be undone under any circumstances.</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── TOOLTIPS ─── -->
+                <div id="tooltips" class="feature-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fa-solid fa-circle-info"></i> Tooltips</span>
+                            <span style="font-size:0.78rem;color:var(--text-muted);">Pure CSS — hover each button</span>
+                        </div>
+
+                        <div class="badge-section-title">Placement Variants</div>
+                        <div class="tooltip-showcase">
+                            <div class="tooltip-wrap tooltip-top">
+                                <button class="btn btn-primary">Tooltip Top</button>
+                                <span class="tooltip-text">Appears above ↑</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-bottom">
+                                <button class="btn btn-success">Tooltip Bottom</button>
+                                <span class="tooltip-text">Appears below ↓</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-left">
+                                <button class="btn btn-warning">Tooltip Left</button>
+                                <span class="tooltip-text">← Appears left</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-right">
+                                <button class="btn btn-danger">Tooltip Right</button>
+                                <span class="tooltip-text">Appears right →</span>
+                            </div>
+                        </div>
+
+                        <div class="badge-section-title">With Icons &amp; Rich Content</div>
+                        <div class="tooltip-showcase">
+                            <div class="tooltip-wrap tooltip-top">
+                                <button class="btn btn-ghost"><i class="fa-brands fa-github"></i> Repository</button>
+                                <span class="tooltip-text">🐙 Opens GitHub repository</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-top">
+                                <button class="btn btn-ghost"><i class="fa-solid fa-star"></i> Star</button>
+                                <span class="tooltip-text">⭐ Add to your stars</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-top">
+                                <button class="btn btn-ghost"><i class="fa-solid fa-code-fork"></i> Fork</button>
+                                <span class="tooltip-text">🍴 Fork this repository</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-top">
+                                <button class="btn btn-ghost"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                                <span class="tooltip-text">🔗 Copy share link</span>
+                            </div>
+                        </div>
+
+                        <div class="badge-section-title">On Badges and Icons</div>
+                        <div class="tooltip-showcase">
+                            <div class="tooltip-wrap tooltip-top">
+                                <span class="badge badge-success" style="cursor:help;">v3.2.0</span>
+                                <span class="tooltip-text">Latest stable release</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-top">
+                                <span class="badge badge-warning" style="cursor:help;">Beta</span>
+                                <span class="tooltip-text">Under active development</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-bottom">
+                                <span style="font-size:1.5rem;cursor:help;">⚙️</span>
+                                <span class="tooltip-text">Settings &amp; configuration</span>
+                            </div>
+                            <div class="tooltip-wrap tooltip-bottom">
+                                <span style="font-size:1.5rem;cursor:help;">📊</span>
+                                <span class="tooltip-text">View analytics dashboard</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <footer>
+                <p>Data from <a href="https://docs.github.com/en/rest" target="_blank">GitHub Public API</a>
+                    &nbsp;·&nbsp; Built with ❤️</p>
+            </footer>
         </div>
     </div>
-    
-    <div id="pagination" class="feature-section hidden" style="padding: 20px;">
-        <div class="card">
-            <h2>Pagination</h2>
-            <div class="pagination">
-                <a href="#" class="page-item">«</a>
-                <a href="#" class="page-item">1</a>
-                <a href="#" class="page-item active">2</a>
-                <a href="#" class="page-item">3</a>
-                <a href="#" class="page-item">4</a>
-                <a href="#" class="page-item">»</a>
-            </div>
-        </div>
-    </div>
-    
-    <div id="popover" class="feature-section hidden" style="padding: 20px;">
-        <div class="card">
-            <h2>Popover</h2>
-            <button class="btn btn-info popover-btn" data-popover="Popover Title" data-content="Popover content goes here">Hover for Popover</button>
-            <div class="popover-box hidden">
-                <div class="popover-title">Popover Title</div>
-                <div class="popover-content">Popover content goes here</div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="tooltips" class="feature-section hidden" style="padding: 20px;">
-        <div class="card">
-            <h2>Tooltips</h2>
-            <button class="btn btn-info tooltip-btn" title="This is a tooltip">Hover for Tooltip</button>
-            <span style="margin-left: 20px;"><button class="btn btn-primary tooltip-btn" title="Another tooltip example">Another Tooltip</button></span>
-            <p style="margin-top: 15px;"><em>Hover over the buttons to see tooltips</em></p>
-        </div>
-    </div>
-    </div> <!-- container -->
-    <footer>
-        <p>Data from GitHub Public API</p>
-    </footer>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
 
     <script src="js/app.js"></script>
 </body>
+
 </html>
